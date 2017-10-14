@@ -1,0 +1,66 @@
+TEST     START   1000               
+FIRST    STL     RETADR                        
+CLOOP    JSUB    RDREC
+STAB	RESB	1100
+	ORG	STAB
+SYMBOL	RESB	6
+VALUE	RESW	1
+FALG	EQU	SYMBOL                        
+         LDA     LENGTH                
+         COMP    ONE                           
+         JEQ     ENDFIL                         
+         JSUB    WRREC                         
+         J       CLOOP                                       
+ENDFIL   LDA    =C'EOF'                 
+         STA     BUFFER                                           
+         LDA     THREE                             
+         STA     LENGTH                                           
+         JSUB    WRREC                                
+         LDL     RETADR                         
+         RSUB        
+	USE 	ABC               
+         LTORG                                                       
+THREE    WORD    3                                                
+ZERO     WORD    0                                                
+ONE      WORD    1                                                
+FIVE     WORD    5                                                
+RETADR   EQU     *                                                
+LENGTH   RESW    1                                                
+BUFFER   RESB    4096            
+	use	de           
+.                                                                 
+.       SUBROUTINE TO READ RECORD INTO BUFFER                     
+.                                                                 
+RDREC    LDX     ZERO                          
+         LDA     ZERO                              
+RLOOP    TD      =*                        
+         JEQ     RLOOP                            
+         RD     =X'F3'              
+         COMP    FIVE                        
+         JLT     EXIT  
+	USE	                         
+         STCH    BUFFER                  
+         TIX     MAXLEN                     
+         JLT     RLOOP                       
+EXIT     STCH    BUFFER                   
+         STX     LENGTH                         
+         LDA     LENGTH            
+         ADD     ONE                                  
+         STA     LENGTH                                           
+         RSUB                      
+         LTORG                                    
+LEN      WORD    4096                      
+MAXLEN   EQU     5                                             
+.                                                                 
+.       SUBROUTINE TO WRITE RECORD FROM BUFFER                    
+.                                 
+	USE	ABC                                
+WRREC    LDX     ZERO                          
+WLOOP    TD     =10                         
+         JEQ     WLOOP                            
+         LDCH    BUFFER                  
+         WD     =X'0A'                           
+         TIX     LENGTH                  
+         JLT     WLOOP                           
+         RSUB                                   
+         END     FIRST
